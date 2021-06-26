@@ -1,10 +1,30 @@
 const fs = require('fs').promises
+const _ = require('lodash')
 const camelcase = require('camelcase')
 const { promisify } = require('util')
 const rimraf = promisify(require('rimraf'))
 const svgr = require('@svgr/core').default
 const babel = require('@babel/core')
 const { compile: compileVue } = require('@vue/compiler-dom')
+
+const hauntedComponent = (svg, componentName, style) =>
+  'import { html, component } from "haunted";\n\nfunction ' +
+  componentName +
+  '() {\n  return html`\n    <style>\n      :host { display: inline-flex; }\n      svg { width: var(--i-icon-width, ' +
+  (style === 'solid' ? '20' : '24') +
+  'px); height: var(--i-icon-height, ' +
+  (style === 'solid' ? '20' : '24') +
+  'px); ' +
+  (style === 'solid'
+    ? 'fill: var(--i-icon-color, currentColor);'
+    : 'stroke: var(--i-icon-color, currentColor);') +
+  ' } </style>\n    ' +
+  svg +
+  "\n  `;\n}\n\ncustomElements.define('" +
+  _.kebabCase(componentName) +
+  "', component(" +
+  componentName +
+  '));'
 
 let transform = {
   react: async (svg, componentName, format) => {
@@ -20,6 +40,18 @@ let transform = {
     return code
       .replace('import * as React from "react"', 'const React = require("react")')
       .replace('export default', 'module.exports =')
+  },
+  haunted: async (svg, componentName, format, style) => {
+    const code = hauntedComponent(svg, componentName, style)
+
+    if (format === 'esm') {
+      return code
+    }
+
+    return code.replace(
+      'import { html, component } from "haunted"',
+      'const { html, component } = require("haunted")'
+    )
   },
   vue: (svg, componentName, format) => {
     let { code } = compileVue(svg, {
@@ -82,7 +114,7 @@ async function buildIcons(package, style, format) {
 
   await Promise.all(
     icons.flatMap(async ({ componentName, svg }) => {
-      let content = await transform[package](svg, componentName, format)
+      let content = await transform[package](svg, componentName, format, style)
       let types
 
       if (package === 'react') {
