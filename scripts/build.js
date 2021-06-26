@@ -8,13 +8,13 @@ const babel = require('@babel/core')
 const { compile: compileVue } = require('@vue/compiler-dom')
 
 const hauntedComponent = (svg, componentName, style) =>
-  'import { component } from "haunted";\nimport { icon } from "haunted-heroicons/icon.esm";\n\nconst _icon = icon(`' +
+  'import { component } from "haunted";\nimport { icon } from "haunted-heroicons/icon.esm";\n\nconst ' +
+  componentName +
+  ' = icon(`' +
   svg +
   '`, "' +
   style +
-  '");\n\nfunction ' +
-  componentName +
-  '() { return _icon(); }\n\ncustomElements.define("' +
+  '");\n\ncustomElements.define("' +
   _.kebabCase(componentName) +
   '", component(' +
   componentName +
