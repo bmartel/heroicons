@@ -14,7 +14,7 @@ const hauntedComponent = (svg, componentName, style) =>
   style +
   '");\n\nfunction ' +
   componentName +
-  '() { return _icon; }\n\ncustomElements.define("' +
+  '() { return _icon(); }\n\ncustomElements.define("' +
   _.kebabCase(componentName) +
   '", component(' +
   componentName +

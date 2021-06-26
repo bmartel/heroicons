@@ -1,7 +1,7 @@
 {
   "name": "haunted-heroicons",
-  "version": "1.0.2",
-  "description": "",
+  "version": "1.0.4",
+  "description": "Heroicons for Haunted WebComponents",
   "keywords": [],
   "homepage": "https://github.com/tailwindlabs/heroicons#readme",
   "repository": {
@@ -9,6 +9,8 @@
     "url": "https://github.com/tailwindlabs/heroicons.git"
   },
   "files": [
+    "icon.js",
+    "icon.esm.js",
     "outline",
     "solid"
   ],
