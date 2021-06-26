@@ -2,3 +2,5 @@
 !.gitignore
 !package.json
 !README.md
+!icon.js
+!icon.esm.js

@@ -8,21 +8,15 @@ const babel = require('@babel/core')
 const { compile: compileVue } = require('@vue/compiler-dom')
 
 const hauntedComponent = (svg, componentName, style) =>
-  'import { html, component } from "haunted";\n\nfunction ' +
-  componentName +
-  '() {\n  return html`\n    <style>\n      :host { display: inline-flex; }\n      svg { width: var(--i-icon-width, ' +
-  (style === 'solid' ? '20' : '24') +
-  'px); height: var(--i-icon-height, ' +
-  (style === 'solid' ? '20' : '24') +
-  'px); ' +
-  (style === 'solid'
-    ? 'fill: var(--i-icon-color, currentColor);'
-    : 'stroke: var(--i-icon-color, currentColor);') +
-  ' } </style>\n    ' +
+  'import { component } from "haunted";\nimport { icon } from "haunted-heroicons/icon.esm";\n\nconst _icon = icon(`' +
   svg +
-  "\n  `;\n}\n\ncustomElements.define('" +
+  '`, "' +
+  style +
+  '");\n\nfunction ' +
+  componentName +
+  '() { return _icon; }\n\ncustomElements.define("' +
   _.kebabCase(componentName) +
-  "', component(" +
+  '", component(' +
   componentName +
   '));'
 
@@ -48,10 +42,12 @@ let transform = {
       return code
     }
 
-    return code.replace(
-      'import { html, component } from "haunted"',
-      'const { html, component } = require("haunted")'
-    )
+    return code
+      .replace('import { component } from "haunted"', 'const { component } = require("haunted")')
+      .replace(
+        'import { icon } from "haunted-heroicons/icon.esm"',
+        'const icon = require("haunted-heroicons/icon")'
+      )
   },
   vue: (svg, componentName, format) => {
     let { code } = compileVue(svg, {
