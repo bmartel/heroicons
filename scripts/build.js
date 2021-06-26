@@ -8,13 +8,13 @@ const babel = require('@babel/core')
 const { compile: compileVue } = require('@vue/compiler-dom')
 
 const hauntedComponent = (svg, componentName, style) =>
-  'import { component } from "haunted";\nimport { icon } from "haunted-heroicons/icon.esm";\n\nconst ' +
-  componentName +
-  ' = icon(`' +
-  svg +
-  '`, "' +
+  'import { html, component } from "haunted";\nimport { iconStyle } from "haunted-heroicons/icon.esm";\n\nconst style = iconStyle("' +
   style +
-  '");\n\ncustomElements.define("' +
+  '");\n\nfunction ' +
+  componentName +
+  '() { return html`${style}' +
+  svg +
+  '`} \n\ncustomElements.define("' +
   _.kebabCase(componentName) +
   '", component(' +
   componentName +
@@ -43,10 +43,13 @@ let transform = {
     }
 
     return code
-      .replace('import { component } from "haunted"', 'const { component } = require("haunted")')
       .replace(
-        'import { icon } from "haunted-heroicons/icon.esm"',
-        'const icon = require("haunted-heroicons/icon")'
+        'import { html, component } from "haunted"',
+        'const { html, component } = require("haunted")'
+      )
+      .replace(
+        'import { iconStyle } from "haunted-heroicons/icon.esm"',
+        'const iconStyle = require("haunted-heroicons/icon")'
       )
   },
   vue: (svg, componentName, format) => {
